@@ -1,12 +1,10 @@
-import employeesSliceReducer from '../features/Employees';
 import { configureStore } from '@reduxjs/toolkit'
+import employeesSliceReducer from '../features/Employees';
 import rolesSliceReducer from '../features/Roles'
-import rolesFlatSliceReducer from '../features/RolesFlat';
 
 export const store = configureStore({
   reducer: {
     roles: rolesSliceReducer,
-    rolesFlat: rolesFlatSliceReducer,
     employees: employeesSliceReducer,
   },
 })
