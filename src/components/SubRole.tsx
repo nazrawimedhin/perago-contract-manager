@@ -2,8 +2,7 @@ import { Avatar, Badge, Card, Text, useMantineTheme } from "@mantine/core";
 import { Link } from "react-router-dom";
 
 function SubRole({ role }) {
-
-const theme = useMantineTheme();
+  const theme = useMantineTheme();
 
   let content;
 
@@ -30,14 +29,16 @@ const theme = useMantineTheme();
 
   return (
     <Link to={`/roleGroup/${role.id}`}>
-      <Card 
+      <Card
         style={{
           background:
             theme.colorScheme === "dark"
               ? theme.colors.dark[5]
               : theme.colors.gray[1],
         }}
-        className="flex justify-around bg-gray-100 mt-6" radius="lg">
+        className="flex justify-around bg-gray-100 mt-6"
+        radius="lg"
+      >
         <Text fw={500} fz="md">
           {role?.name}
         </Text>

@@ -1,14 +1,21 @@
-import { Pagination } from '@mantine/core';
+import { Pagination } from "@mantine/core";
 
 interface Props {
-  page: number,
-  setPage: (page: number) => void,
-  total: number
+  page: number;
+  setPage: (page: number) => void;
+  total: number;
 }
 
-function Paginate({page, setPage, total}: Props) {
-
-  return <Pagination color='green' value={page} onChange={setPage} total={total} siblings={1} />
+function Paginate({ page, setPage, total }: Props) {
+  return (
+    <Pagination
+      color="green"
+      value={page}
+      onChange={setPage}
+      total={total}
+      siblings={1}
+    />
+  );
 }
 
-export default Paginate
+export default Paginate;
