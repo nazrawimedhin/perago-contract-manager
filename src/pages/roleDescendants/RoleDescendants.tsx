@@ -5,7 +5,7 @@ import {
   Divider,
   Flex,
   Group,
-  LoadingOverlay,
+  Loader,
   Popover,
   Select,
   Text,
@@ -14,60 +14,59 @@ import EmployeesTable from "../../components/EmployeesTable";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Paginate from "../../components/Paginate";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { RiDeleteBinFill } from "react-icons/ri";
 import { AiTwotoneEdit } from "react-icons/ai";
 import { CreateRole, EmployeeResults, Role } from "../../utils/types";
-import Alarm from "../../components/Notification";
+import Loading from "../../components/Loading";
 
 function RoleEmployees() {
+
+  const Navigate = useNavigate();
   const { id } = useParams();
   const [descendants, setDescendants] = useState<EmployeeResults>();
   const [role, setRole] = useState<Role>();
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [rolesExceptChild, setRolesExceptChild] = useState<RoleFlat[]>();
+  const [rolesExceptChild, setRolesExceptDescendants] = useState();
   const [newParent, setNewParent] = useState<string>();
 
   const handleDelete = async (id: string) => {
+    setLoading(true);
     const data: Pick<CreateRole, "parentId"> = {
       parentId: newParent,
     };
-    await axios
-      .delete(`http://localhost:3000/roles/${id}`, data as any)
-      .then((response) => {
-        <Alarm title='Role Deleted' message={response.data} color='red'></Alarm>
-      });
+      await axios.delete(`http://localhost:3000/roles/${id}`, data);
+      setLoading(false);
+      alert('Role deleted')
+      Navigate('/')
   };
+
+  useEffect(() => {
+    axios.get(`http://localhost:3000/roles/${id}`).then((response) => {
+      setRole(response.data);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/roles/${id}/employees`)
+      .then((response) => {
+        setDescendants(response.data);
+      });
+  }, [id]);
 
   useEffect(() => {
     axios
       .get(`http://localhost:3000/roles/${id}/except_descendants`)
       .then((response) => {
-        setRolesExceptChild(response.data);
+        setRolesExceptDescendants(response.data);
       });
-  }, [id]);
-
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`http://localhost:3000/roles/${id}/employees`)
-      .then((response) => {
-        setDescendants(response.data);
-        setLoading(false);
-      });
-  }, [id]);
-
-  useEffect(() => {
-    setLoading(true);
-    axios.get(`http://localhost:3000/roles/${id}`).then((response) => {
-      setRole(response.data);
-      setLoading(false);
-    });
   }, [id]);
 
   return (
     <Container pos="relative">
+      <Loading loading={loading}/>
       <Flex className="justify-between">
         <Group>
           <Text className="my-4" c="green" fw={500} fz={24}>
@@ -111,7 +110,7 @@ function RoleEmployees() {
                   dropdownComponent="div"
                 />
               ) : (
-                <></>
+                <Loader variant='bars' color='green'/>
               )}
               <Text c="red" fz={14}>
                 All Employees associated with this role will be deleted!
@@ -131,8 +130,7 @@ function RoleEmployees() {
         </Group>
       </Flex>
 
-      <LoadingOverlay visible={loading} overlayBlur={1} />
-      {descendants ? <EmployeesTable employees={descendants.results} /> : <></>}
+      {descendants ? <EmployeesTable employees={descendants.results} /> : <Loading loading={true}/>}
       <Center className="mt-2">
         <Paginate
           page={page}

@@ -8,6 +8,8 @@ import {
   Container,
   Select,
   FileButton,
+  Loader,
+  useMantineTheme
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -16,10 +18,9 @@ import { TbCalendar } from "react-icons/tb";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { FaUpload } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
-import fetchRolesFlat from "../../features/RolesFlat";
-import Loading from "../../components/Loading";
 import axios from "axios"
+import Loading from "../../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -77,8 +78,11 @@ const useStyles = createStyles((theme) => ({
 
 export default function CreateEmployee() {
 
-  const { classes } = useStyles();
+  const theme = useMantineTheme();
 
+  const Navigate = useNavigate();
+  const { classes } = useStyles();
+  const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 
   const convertBase64 = (file: File) => {
@@ -120,26 +124,30 @@ export default function CreateEmployee() {
   type FormData = yup.InferType<typeof EmployeeSchema>;
 
   const onSubmit = async (data: unknown) => {
+    setLoading(true);
     let photo;
     if (file) photo = await convertBase64(file);
-    const response = await axios.post("http://localhost:3000/employees", {
+      await axios.post("http://localhost:3000/employees", {
       ...data,
       photo,
     });
-    alert(response);
+    setLoading(false);
+    alert('New employee has been added successfully')
+    Navigate('/')
   };
 
-  const dispatch = useDispatch();
-  const loading = useSelector((state) => state.rolesFlat.loading);
-  const rolesFlat = useSelector((state) => state.rolesFlat.RolesFlat);
+  const [rolesFlat, setRolesFlat] = useState();
 
   useEffect(() => {
-    dispatch(fetchRolesFlat);
-  }, [dispatch]);
+    axios.get('http://localhost:3000/roles?flat=true').then((response) => {
+      setRolesFlat(response.data)
+    })
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Container className={`${classes.wrapper} mt-10`} size="md">
+        <Loading loading={loading}/>
         <SimpleGrid
           cols={1}
           spacing={50}
@@ -230,7 +238,7 @@ export default function CreateEmployee() {
                   )}
                 />
               ) : 
-                <Loading loading={loading} />
+                <Loader variant="bars" color="green"/>
               }
               <Controller
                 name="hireDate"
