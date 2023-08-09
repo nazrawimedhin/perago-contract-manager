@@ -1,4 +1,11 @@
-import { Card, Center, Container, Group, Text, createStyles } from "@mantine/core";
+import {
+  Card,
+  Center,
+  Container,
+  Group,
+  Text,
+  createStyles,
+} from "@mantine/core";
 import SubRole from "../../components/SubRole";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -9,14 +16,15 @@ import Loading from "../../components/Loading";
 
 const useStyles = createStyles((theme) => ({
   card: {
-
-      backgroundColor:        theme.colorScheme === "dark"? theme.colors.dark[5] : theme.colors.gray[1],
-  }
-}))
+    backgroundColor:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[5]
+        : theme.colors.gray[1],
+  },
+}));
 
 function RoleGroup() {
-
-  const { classes } = useStyles()
+  const { classes } = useStyles();
 
   const { id } = useParams();
   const [role, setRole] = useState<Role>();
@@ -33,15 +41,17 @@ function RoleGroup() {
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`http://localhost:3000/roles/${id}/employees`).then((response) => {
-      setDescendants(response.data);
-      setLoading(false);
-    });
+    axios
+      .get(`http://localhost:3000/roles/${id}/employees`)
+      .then((response) => {
+        setDescendants(response.data);
+        setLoading(false);
+      });
   }, [id]);
 
   return (
-    <Container pos={'relative'}>
-      <Loading loading={loading}/>
+    <Container pos={"relative"}>
+      <Loading loading={loading} />
       <Group className="flex justify-between mt-7 mb-10">
         <RoleAvatar role={role} />
         <Card className={`${classes.card}  p-5`} radius="lg">

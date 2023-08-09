@@ -21,7 +21,6 @@ import { CreateRole, EmployeeResults, Role } from "../../utils/types";
 import Loading from "../../components/Loading";
 
 function RoleEmployees() {
-
   const Navigate = useNavigate();
   const { id } = useParams();
   const [descendants, setDescendants] = useState<EmployeeResults>();
@@ -36,10 +35,10 @@ function RoleEmployees() {
     const data: Pick<CreateRole, "parentId"> = {
       parentId: newParent,
     };
-      await axios.delete(`http://localhost:3000/roles/${id}`, data);
-      setLoading(false);
-      alert('Role deleted')
-      Navigate('/')
+    await axios.delete(`http://localhost:3000/roles/${id}`, data);
+    setLoading(false);
+    alert("Role deleted");
+    Navigate("/");
   };
 
   useEffect(() => {
@@ -66,7 +65,7 @@ function RoleEmployees() {
 
   return (
     <Container pos="relative">
-      <Loading loading={loading}/>
+      <Loading loading={loading} />
       <Flex className="justify-between">
         <Group>
           <Text className="my-4" c="green" fw={500} fz={24}>
@@ -110,15 +109,15 @@ function RoleEmployees() {
                   dropdownComponent="div"
                 />
               ) : (
-                <Loader variant='bars' color='green'/>
+                <Loader variant="bars" color="green" />
               )}
               <Text c="red" fz={14}>
                 All Employees associated with this role will be deleted!
               </Text>
               <Divider my="xs" />
               <Button
-                onClick={() => handleDelete(role?.id ?? '')}
-                className='bg-white hover:bg-red-100'
+                onClick={() => handleDelete(role?.id ?? "")}
+                className="bg-white hover:bg-red-100"
                 radius="xl"
                 size="sm"
                 c="red"
@@ -130,7 +129,11 @@ function RoleEmployees() {
         </Group>
       </Flex>
 
-      {descendants ? <EmployeesTable employees={descendants.results} /> : <Loading loading={true}/>}
+      {descendants ? (
+        <EmployeesTable employees={descendants.results} />
+      ) : (
+        <Loading loading={true} />
+      )}
       <Center className="mt-2">
         <Paginate
           page={page}

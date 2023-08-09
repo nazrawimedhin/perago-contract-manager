@@ -9,24 +9,22 @@ import Loading from "../../components/Loading";
 function Employees() {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const loading = useSelector(state => state.employees.loading)
-  const data = useSelector(state => state.employees.data)
+  const loading = useSelector((state) => state.employees.loading);
+  const data = useSelector((state) => state.employees.data);
 
   useEffect(() => {
-      if (!data || data.page !== page) {
-        dispatch(fetchEmployees(page));
-      }
-    }, [dispatch, page]);
+    if (!data || data.page !== page) {
+      dispatch(fetchEmployees(page));
+    }
+  }, [dispatch, page, data]);
 
   return (
     <Container pos="relative">
       <Text className="my-3" c="green" fw={500} fz={24}>
         All Employees
       </Text>
-      <Loading loading={loading}/>
-      {data && (
-        <EmployeesTable employees={data.results} />
-      ) }
+      <Loading loading={loading} />
+      {data && <EmployeesTable employees={data.results} />}
       <Center className="mt-2">
         <Paginate page={page} setPage={setPage} total={data?.pages ?? 10} />
       </Center>

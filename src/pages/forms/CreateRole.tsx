@@ -69,14 +69,13 @@ const useStyles = createStyles((theme) => ({
   },
 
   button: {
-    '&:hover': {
-      backgroundColor : theme.colors.green[6]
-    }
-  }
+    "&:hover": {
+      backgroundColor: theme.colors.green[6],
+    },
+  },
 }));
 
 export default function CreateRole() {
-
   const [loading, setLoading] = useState(false);
   const Navigate = useNavigate();
   const { classes } = useStyles();
@@ -100,23 +99,23 @@ export default function CreateRole() {
   type FormData = yup.InferType<typeof RoleSchema>;
 
   const onSubmit = async (data) => {
-    setLoading(true)
-    const response = await axios.post('http://localhost:3000/roles/', data)
-    setLoading(false)
-    alert('New role has been created successfully')
-    Navigate('/')
+    setLoading(true);
+    await axios.post("http://localhost:3000/roles/", data);
+    setLoading(false);
+    alert("New role has been created successfully");
+    Navigate("/");
   };
 
   useEffect(() => {
-    axios.get('http://localhost:3000/roles?flat=true').then((response) => {
-      setRolesFlat(response.data)
-    })
+    axios.get("http://localhost:3000/roles?flat=true").then((response) => {
+      setRolesFlat(response.data);
+    });
   }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Container className={`${classes.wrapper} mt-10`} size="xs">
-      <Loading loading={loading}/>
+        <Loading loading={loading} />
         <Container className={classes.form}>
           <Controller
             name="name"
@@ -134,9 +133,8 @@ export default function CreateRole() {
               />
             )}
           />
-          <>
-            {rolesFlat ? (
-              <Controller
+          {rolesFlat ? (
+            <Controller
               name="parentId"
               control={control}
               render={({ field }) => (
@@ -148,15 +146,14 @@ export default function CreateRole() {
                   }))}
                   label="Parent Role"
                   placeholder="Select Role e.g. Backend Developer"
-                error={errors.parentId?.message}
+                  error={errors.parentId?.message}
                   dropdownComponent="div"
                 />
               )}
             />
-            ) : (
-                <Loader variant="bars" color="green"/>
-            )}
-          </>
+          ) : (
+            <Loader variant="bars" color="green" />
+          )}
           <Controller
             name="description"
             control={control}

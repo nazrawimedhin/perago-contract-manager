@@ -9,7 +9,6 @@ import {
   Select,
   FileButton,
   Loader,
-  useMantineTheme
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -18,7 +17,7 @@ import { TbCalendar } from "react-icons/tb";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { FaUpload } from "react-icons/fa";
-import axios from "axios"
+import axios from "axios";
 import Loading from "../../components/Loading";
 import { useNavigate } from "react-router-dom";
 
@@ -77,9 +76,6 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function CreateEmployee() {
-
-  const theme = useMantineTheme();
-
   const Navigate = useNavigate();
   const { classes } = useStyles();
   const [loading, setLoading] = useState(false);
@@ -127,27 +123,27 @@ export default function CreateEmployee() {
     setLoading(true);
     let photo;
     if (file) photo = await convertBase64(file);
-      await axios.post("http://localhost:3000/employees", {
+    await axios.post("http://localhost:3000/employees", {
       ...data,
       photo,
     });
     setLoading(false);
-    alert('New employee has been added successfully')
-    Navigate('/')
+    alert("New employee has been added successfully");
+    Navigate("/");
   };
 
   const [rolesFlat, setRolesFlat] = useState();
 
   useEffect(() => {
-    axios.get('http://localhost:3000/roles?flat=true').then((response) => {
-      setRolesFlat(response.data)
-    })
+    axios.get("http://localhost:3000/roles?flat=true").then((response) => {
+      setRolesFlat(response.data);
+    });
   }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Container className={`${classes.wrapper} mt-10`} size="md">
-        <Loading loading={loading}/>
+        <Loading loading={loading} />
         <SimpleGrid
           cols={1}
           spacing={50}
@@ -237,9 +233,9 @@ export default function CreateEmployee() {
                     />
                   )}
                 />
-              ) : 
-                <Loader variant="bars" color="green"/>
-              }
+              ) : (
+                <Loader variant="bars" color="green" />
+              )}
               <Controller
                 name="hireDate"
                 control={control}

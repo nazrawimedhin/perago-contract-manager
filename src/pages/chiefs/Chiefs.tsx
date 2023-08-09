@@ -22,7 +22,7 @@ function Chiefs() {
 
   return (
     <Box pos="relative">
-      <Loading loading={loading}/>
+      <Loading loading={loading} />
       <div className="grid justify-center mb-28 mt-20">
         {ceo && (
           <EmployeeAvatar
