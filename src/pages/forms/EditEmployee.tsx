@@ -237,7 +237,7 @@ export default function EditEmployee() {
                   )}
                 />
               ) : (
-                <Loader />
+                <Loader variant="bars" color="green"/>
               )}
               <Controller
                 name="hireDate"

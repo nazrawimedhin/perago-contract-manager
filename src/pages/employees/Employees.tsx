@@ -13,8 +13,10 @@ function Employees() {
   const data = useSelector(state => state.employees.data)
 
   useEffect(() => {
-    dispatch(fetchEmployees(page));
-  }, [dispatch, page]);
+      if (!data || data.page !== page) {
+        dispatch(fetchEmployees(page));
+      }
+    }, [dispatch, page]);
 
   return (
     <Container pos="relative">

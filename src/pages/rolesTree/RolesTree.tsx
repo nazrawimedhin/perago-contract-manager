@@ -14,8 +14,10 @@ function RolesTree() {
   const loading = useSelector((state) => state.roles.loading);
 
     useEffect(() => {
-      dispatch(fetchRoles());
-    }, [dispatch])
+      if (!root){
+        dispatch(fetchRoles());
+      }
+        }, [dispatch])
 
   return (
     <Box className="mt-5" pos={"relative"} >

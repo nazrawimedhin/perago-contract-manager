@@ -163,7 +163,7 @@ import { CreateRole, Role } from "../../utils/types";
                 )}
               />
               ) : (
-                <Loader />
+                <Loader variant="bars" color="green"/>
               )}
             </>
             <Controller

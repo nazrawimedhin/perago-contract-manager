@@ -7,15 +7,15 @@ import {
   rem,
   Container,
   Select,
+  Loader,
 } from "@mantine/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
-import { useDispatch, useSelector } from "react-redux";
-import fetchRolesFlat from "../../features/RolesFlat";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -77,7 +77,10 @@ const useStyles = createStyles((theme) => ({
 
 export default function CreateRole() {
 
+  const [loading, setLoading] = useState(false);
+  const Navigate = useNavigate();
   const { classes } = useStyles();
+  const [rolesFlat, setRolesFlat] = useState();
 
   const RoleSchema = yup
     .object({
@@ -97,21 +100,23 @@ export default function CreateRole() {
   type FormData = yup.InferType<typeof RoleSchema>;
 
   const onSubmit = async (data) => {
+    setLoading(true)
     const response = await axios.post('http://localhost:3000/roles/', data)
-    alert(response.data)
+    setLoading(false)
+    alert('New role has been created successfully')
+    Navigate('/')
   };
 
-  const dispatch = useDispatch();
-  const rolesFlat = useSelector((state) => state.rolesFlat.rolesFlat);
-  const loading = useSelector((state) => state.rolesFlat.loading);
-
   useEffect(() => {
-    dispatch(fetchRolesFlat)
-  }, [dispatch]);
+    axios.get('http://localhost:3000/roles?flat=true').then((response) => {
+      setRolesFlat(response.data)
+    })
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Container className={`${classes.wrapper} mt-10`} size="xs">
+      <Loading loading={loading}/>
         <Container className={classes.form}>
           <Controller
             name="name"
@@ -149,7 +154,7 @@ export default function CreateRole() {
               )}
             />
             ) : (
-              <Loading loading={loading} />
+                <Loader variant="bars" color="green"/>
             )}
           </>
           <Controller
