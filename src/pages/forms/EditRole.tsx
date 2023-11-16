@@ -14,8 +14,10 @@ import axios from "axios";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CreateRole, Role } from "../../utils/types";
+import { setStatus } from "../../features/Status";
+import { useDispatch, useSelector } from "react-redux";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -76,27 +78,14 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function EditRole() {
+
+  const Navigate = useNavigate();
+  const status = useSelector((state) => state.status);
+  const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
-
   const { classes } = useStyles();
-
-  const [rolesExceptDescendants, setRolesExceptDescendants] =
-    useState<Role[]>();
+  const [rolesExceptDescendants, setRolesExceptDescendants] = useState<Role[]>();
   const [role, setRole] = useState<Role>();
-
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3000/roles/${id}/except_descendants`)
-      .then((response) => {
-        setRolesExceptDescendants(response.data);
-      });
-  }, [id]);
-
-  useEffect(() => {
-    axios.get(`http://localhost:3000/roles/${id}`).then((response) => {
-      setRole(response.data);
-    });
-  }, [id]);
 
   const RoleSchema = yup
     .object({
@@ -120,9 +109,46 @@ export default function EditRole() {
   type FormData = yup.InferType<typeof RoleSchema>;
 
   const onSubmit = async (data: CreateRole) => {
-    const response = await axios.patch(`http://localhost/:3000/${id}`, data);
-    console.log(response);
+    dispatch(
+      setStatus({
+        title: "Loading",
+        message: "Uploading data to the server",
+        type: "load",
+      })
+    );
+
+    await axios
+      .patch(`http://localhost/:3000/${id}`, data)
+      .then((response) => {
+        dispatch(
+          setStatus({
+            title: "Success",
+            message: "Role Created successfully",
+            type: "success",
+          })
+        );
+        Navigate('/roles')
+      })
+      .catch((error) => {
+        dispatch(
+          setStatus({ title: "Error", message: error.message, type: "error" })
+        );
+      });
   };
+
+  useEffect(() => {
+    axios.get(`http://localhost:3000/roles/${id}`).then((response) => {
+      setRole(response.data);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/roles/${id}/except_descendants`)
+      .then((response) => {
+        setRolesExceptDescendants(response.data);
+      });
+  }, [id]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -185,10 +211,11 @@ export default function EditRole() {
               />
             )}
           />
-
           <Group position="right" mt="md">
-            <Button type="submit" className={`${classes.button} bg-green-600`}>
-              Register Role
+            <Button 
+              disabled={status?.type === "load"}
+              type="submit" className={`${classes.button} bg-green-600`}>
+              Update Role
             </Button>
           </Group>
         </Container>

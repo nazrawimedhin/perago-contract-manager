@@ -14,8 +14,9 @@ import axios from "axios";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { setStatus } from "../../features/Status";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Loading from "../../components/Loading";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -76,8 +77,10 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function CreateRole() {
-  const [loading, setLoading] = useState(false);
+
   const Navigate = useNavigate();
+  const status = useSelector((state) => state.status);
+  const dispatch = useDispatch();
   const { classes } = useStyles();
   const [rolesFlat, setRolesFlat] = useState();
 
@@ -99,11 +102,30 @@ export default function CreateRole() {
   type FormData = yup.InferType<typeof RoleSchema>;
 
   const onSubmit = async (data) => {
-    setLoading(true);
-    await axios.post("http://localhost:3000/roles/", data);
-    setLoading(false);
-    alert("New role has been created successfully");
-    Navigate("/");
+    dispatch(
+      setStatus({
+        title: "Loading",
+        message: "Uploading data to the server",
+        type: "load",
+      })
+    );
+    await axios
+      .post("http://localhost:3000/roles/", data)
+      .then((response) => {
+        dispatch(
+          setStatus({
+            title: "Success",
+            message: "Role Created successfully",
+            type: "success",
+          })
+        );
+        Navigate("/roles");
+      })
+      .catch((error) => {
+        dispatch(
+          setStatus({ title: "Error", message: error.message, type: "error" })
+        );
+      });
   };
 
   useEffect(() => {
@@ -115,7 +137,6 @@ export default function CreateRole() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Container className={`${classes.wrapper} mt-10`} size="xs">
-        <Loading loading={loading} />
         <Container className={classes.form}>
           <Controller
             name="name"
@@ -173,7 +194,11 @@ export default function CreateRole() {
           />
 
           <Group position="right" mt="md">
-            <Button type="submit" className={`${classes.button} bg-green-600`}>
+            <Button
+              disabled={status?.type === "load"}
+              type="submit"
+              className={`${classes.button} bg-green-600`}
+            >
               Register Role
             </Button>
           </Group>
