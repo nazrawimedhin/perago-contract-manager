@@ -17,9 +17,12 @@ import { DatePickerInput } from "@mantine/dates";
 import { TbCalendar } from "react-icons/tb";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Employee, Role } from "../../utils/types";
 import { FaUpload } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { setStatus } from "../../features/Status";
+import { uploadFile } from "@uploadcare/upload-client";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -75,25 +78,14 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function EditEmployee() {
-  const { classes } = useStyles();
 
+  const Navigate = useNavigate()
+  const status = useSelector((state) => state.status);
+  const dispatch = useDispatch()
+  const { classes } = useStyles();
   const { id } = useParams();
   const [employee, setEmployee] = useState<Employee>();
-
   const [file, setFile] = useState<File | null>(null);
-
-  const convertBase64 = (file: File) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  };
 
   const handleFile = async (file: File) => {
     setFile(file);
@@ -126,29 +118,55 @@ export default function EditEmployee() {
   });
   type FormData = yup.InferType<typeof EmployeeSchema>;
 
-  const onSubmit = async (data: unknown) => {
+  const onSubmit = async (data: FormData) => {
+
+    dispatch(
+      setStatus({ title: "Loading", message: 'Uploading data to the server', type: "load" })
+    );
+
     let photo;
-    if (file) photo = await convertBase64(file);
-    const response = await axios.post("http://localhost:3000/employees", {
-      ...data,
-      photo,
-    });
-    alert(response);
+    if (file) {
+      photo = await uploadFile(file, {
+        publicKey: "9a12ffff4c40ae9f57ef",
+        store: "auto",
+        metadata: {
+          subsystem: "uploader",
+          employee: "photo",
+        },
+      });
+    }
+
+    const photoUrl = photo?.cdnUrl;
+
+    await axios
+      .patch("http://localhost:3000/employees", {
+        ...data,
+        photo: photoUrl,
+      })
+      .then(() => {
+        dispatch(
+          setStatus({ title: "Success", message: 'New employee created successfully', type: "success" })
+        );
+        Navigate('/employees')
+      })
+      .catch((error) => {
+        dispatch(
+          setStatus({ title: "Error", message: error.message, type: "error" })
+        );
+      });
   };
+
+  useEffect(() => {
+    axios.get(`http://localhost:3000/employees/${id}`).then((response) => {
+      setEmployee(response.data);
+    });
+  }, [id]);
 
   useEffect(() => {
     axios.get("http://localhost:3000/roles?flat=true").then((response) => {
       setRolesFlat(response.data);
     });
   }, []);
-
-  useEffect(() => {
-    console.log(id);
-    axios.get(`http://localhost:3000/employees/${id}`).then((response) => {
-      setEmployee(response.data);
-      console.log(response.data);
-    });
-  }, [id]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -294,6 +312,7 @@ export default function EditEmployee() {
               />
               <Group position="right" mt="md">
                 <Button
+                  disabled={status?.type === "load"}
                   type="submit"
                   className={`${classes.button} bg-green-600`}
                 >

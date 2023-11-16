@@ -11,20 +11,35 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { FaUserEdit } from "react-icons/fa";
-import { TiUserDelete } from "react-icons/ti";
+import { MdPersonRemove } from "react-icons/md";
 import Loading from "../../components/Loading";
+import { useDispatch } from "react-redux";
+import { setStatus } from "../../features/Status";
 
 function Employee() {
+
+  const dispatch = useDispatch()
   const { id } = useParams();
   const [employee, setEmployee] = useState();
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async (id) => {
+    dispatch(
+      setStatus({ title: "Loading", message: 'Uploading data to the server', type: "load" })
+    );
+
     await axios
       .delete(`http://localhost:3000/employees/${id}`)
       .then((response) => {
-        alert(response.data);
-      });
+        dispatch(
+          setStatus({ title: "Success", message: 'Employee deleted successfully', type: "success" })
+        );
+      }).catch( (error) => {
+        dispatch(
+          setStatus({ title: "Success", message: error.error.message, type: "success" })
+        );
+      }
+      );
   };
 
   useEffect(() => {
@@ -51,9 +66,11 @@ function Employee() {
               <Text>{employee.hireDate}</Text>
               <Text>{employee.birthDate}</Text>
               <Text>{employee.gender}</Text>
-              <Group>
-                <Link to={{ pathname: `/editEmployee/${employee.id}` }}>
-                  <FaUserEdit size={25} className="mr-4" />
+              <Group className="flex">
+                <Link to={{ pathname: `/editEmployee/${employee.id}`}}>
+                  <Button variant="subtle" color='green' rightIcon={<FaUserEdit />}>
+                    Edit
+                  </Button>
                 </Link>
                 <Popover
                   width={200}
@@ -63,10 +80,13 @@ function Employee() {
                   radius="xl"
                 >
                   <Popover.Target>
-                    <TiUserDelete size={25} />
+                      <Button variant="subtle" color="red" rightIcon={<MdPersonRemove />}>
+                        Delete
+                      </Button>
                   </Popover.Target>
                   <Popover.Dropdown className="grid place-items-center">
                     <Button
+                      className="hover:bg-red-100"
                       onClick={() => handleDelete(employee.id)}
                       size="sm"
                       c="red"
