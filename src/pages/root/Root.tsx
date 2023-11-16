@@ -10,11 +10,12 @@ import {
 import { Outlet } from 'react-router-dom';
 import SideBar from '../../components/SideBar';
 import Head from '../../components/Head';
+import Notify from '../../components/Notify';
 
 export default function AppShellDemo() {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
-  
+
   return (
     <AppShell
       navbarOffsetBreakpoint="sm"
@@ -42,6 +43,7 @@ export default function AppShellDemo() {
       }
     >
       <Outlet/>
+      <Notify/>
     </AppShell>
   );
 }
