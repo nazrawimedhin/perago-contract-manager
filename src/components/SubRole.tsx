@@ -21,7 +21,7 @@ function SubRole({ role }) {
     );
   } else {
     content = (
-      <Badge fw={500} fz="md">
+      <Badge fw={500} fz="md" color="yellow">
         Vacant Role
       </Badge>
     );

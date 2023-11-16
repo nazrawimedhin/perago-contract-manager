@@ -19,26 +19,53 @@ import { RiDeleteBinFill } from "react-icons/ri";
 import { AiTwotoneEdit } from "react-icons/ai";
 import { CreateRole, EmployeeResults, Role } from "../../utils/types";
 import Loading from "../../components/Loading";
+import { setStatus } from "../../features/Status";
+import { useDispatch, useSelector } from "react-redux";
 
 function RoleEmployees() {
+
+  const dispatch = useDispatch();
+  const status = useSelector((state) => state.status);
   const Navigate = useNavigate();
   const { id } = useParams();
   const [descendants, setDescendants] = useState<EmployeeResults>();
   const [role, setRole] = useState<Role>();
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [rolesExceptChild, setRolesExceptDescendants] = useState();
   const [newParent, setNewParent] = useState<string>();
 
-  const handleDelete = async (id: string) => {
-    setLoading(true);
+  const handleDelete = async () => {
+
+    dispatch(
+      setStatus({
+        title: "Loading",
+        message: "Uploading data to the server",
+        type: "load",
+      })
+    );
+
     const data: Pick<CreateRole, "parentId"> = {
       parentId: newParent,
     };
-    await axios.delete(`http://localhost:3000/roles/${id}`, data);
-    setLoading(false);
-    alert("Role deleted");
-    Navigate("/");
+
+    await axios
+      .delete(`http://localhost:3000/roles/${id}`, data)
+      .then(() => {
+        dispatch(
+          setStatus({
+            title: "Success",
+            message: "New employee created successfully",
+            type: "success",
+          })
+        );
+        Navigate("/roles");
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch(
+          setStatus({ title: "Error", message: error.message, type: "error" })
+        );
+      });
   };
 
   useEffect(() => {
@@ -65,7 +92,6 @@ function RoleEmployees() {
 
   return (
     <Container pos="relative">
-      <Loading loading={loading} />
       <Flex className="justify-between">
         <Group>
           <Text className="my-4" c="green" fw={500} fz={24}>
@@ -95,7 +121,7 @@ function RoleEmployees() {
               </Flex>
             </Popover.Target>
             <Popover.Dropdown className="grid place-items-center">
-              {role?.children.length ?? 0 > 0 ? (
+              {role?.children.length > 0 ? (
                 <Select
                   onChange={(value) => value && setNewParent(value)}
                   data={
@@ -108,6 +134,8 @@ function RoleEmployees() {
                   placeholder="Select Role e.g. Backend Developer"
                   dropdownComponent="div"
                 />
+              ) : role?.children.length === 0 ? (
+                <></>
               ) : (
                 <Loader variant="bars" color="green" />
               )}
@@ -116,7 +144,8 @@ function RoleEmployees() {
               </Text>
               <Divider my="xs" />
               <Button
-                onClick={() => handleDelete(role?.id ?? "")}
+                disabled={status?.type === "load"}
+                onClick={() => handleDelete()}
                 className="bg-white hover:bg-red-100"
                 radius="xl"
                 size="sm"

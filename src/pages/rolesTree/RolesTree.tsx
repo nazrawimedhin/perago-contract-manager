@@ -20,9 +20,9 @@ function RolesTree() {
 
   return (
     <Box className="mt-5" pos={"relative"}>
-      <Loading loading={loading} />
+      <Loading loading={loading}/>
       <Tree
-        label={<Image src={logo} width={125} display={"inline-block"} />}
+        label={<Image src={logo} width={150} display={"inline-block"} />}
         lineColor="lightgreen"
         lineWidth="3px"
       >
