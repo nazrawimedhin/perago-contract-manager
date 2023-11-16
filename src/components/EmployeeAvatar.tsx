@@ -9,6 +9,7 @@ interface Props {
 }
 
 function EmployeeAvatar({ id, photo, fullName, role }: Props) {
+
   const theme = useMantineTheme();
 
   return (

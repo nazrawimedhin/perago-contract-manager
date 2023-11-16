@@ -1,4 +1,4 @@
-import { Avatar, Group, Table, Text } from "@mantine/core";
+import { Avatar, Center, Group, Table, Text } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../utils/types";
 
@@ -33,30 +33,38 @@ function EmployeesTable({ employees }: Props) {
         <Text fz={16}>{employee?.role.name}</Text>
       </td>
       <td>
-        <Text fz={16}>
-          {employee?.role.reportsTo?.name || employee?.reportsTo?.name}
-        </Text>
+        <Text fz={16}>{employee?.role.reportsTo?.name ||employee?.reportsTo?.name}</Text>
       </td>
     </tr>
   ));
 
   return (
-    <Table highlightOnHover>
-      <thead>
-        <tr>
-          <th>
-            <Text fz={20}>Name</Text>
-          </th>
-          <th>
-            <Text fz={20}>Role</Text>
-          </th>
-          <th>
-            <Text fz={20}>Reports To</Text>
-          </th>
-        </tr>
-      </thead>
-      <tbody>{rows}</tbody>
-    </Table>
+    <>
+      {employees.length === 0 ? (
+        <Center>
+          <Text fz="xl" fw={700}>
+            No employees
+          </Text>
+        </Center>
+      ) : (
+        <Table highlightOnHover>
+          <thead>
+            <tr>
+              <th>
+                <Text fz={20}>Name</Text>
+              </th>
+              <th>
+                <Text fz={20}>Role</Text>
+              </th>
+              <th>
+                <Text fz={20}>Reports To</Text>
+              </th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </Table>
+      )}
+    </>
   );
 }
 
