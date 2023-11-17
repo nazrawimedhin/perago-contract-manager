@@ -1,4 +1,4 @@
-# Contract Manager App
+# Perago - Contract Manager App
 
 Welcome to the Contract Manager App! This application serves as a comprehensive tool for managing contracts within an organization. Below, you'll find information on how to use the app to list all employees, their roles, and explore the organizational hierarchy.
 
