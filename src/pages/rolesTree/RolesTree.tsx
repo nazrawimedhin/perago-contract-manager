@@ -1,9 +1,9 @@
 import { Tree } from "react-organizational-chart";
-import RoleNode from "../../components/RoleNode";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { Image, Box } from "@mantine/core";
+import RoleNode from "../../components/RoleNode";
 import { logo } from "../../assets/assets";
-import { useDispatch, useSelector } from "react-redux";
 import { fetchRoles } from "../../features/Roles";
 import Loading from "../../components/Loading";
 
@@ -16,11 +16,18 @@ function RolesTree() {
     if (!root) {
       dispatch(fetchRoles());
     }
-  }, [dispatch]);
+  }, [dispatch, root]);
+
+  if (loading) {
+    return (
+      <Box className="mt-5" pos={"relative"}>
+        <Loading loading={loading} />;
+      </Box>
+    );
+  }
 
   return (
-    <Box className="mt-5" pos={"relative"}>
-      <Loading loading={loading}/>
+    <Box className="mt-5" pos={"relative"} sx={{ width: "100%" }}>
       <Tree
         label={<Image src={logo} width={150} display={"inline-block"} />}
         lineColor="lightgreen"

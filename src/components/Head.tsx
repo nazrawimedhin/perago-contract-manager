@@ -12,7 +12,7 @@ import {
 import { IoAdd } from "react-icons/io5";
 import { logo } from "../assets/assets";
 import { Link } from "react-router-dom";
-import SwitchToggle from "./SchemeToggle";
+import SwitchColorScheme from "./ColorSchemeToggle";
 
 const useStyles = createStyles((theme) => ({
   button: {
@@ -57,7 +57,7 @@ function Head() {
                 Add Employee
               </Button>
             </Link>
-            <SwitchToggle />
+            <SwitchColorScheme />
           </Group>
         </Flex>
       </Container>

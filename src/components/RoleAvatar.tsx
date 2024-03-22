@@ -1,15 +1,6 @@
-import {
-  Avatar,
-  Badge,
-  Card,
-  Center,
-  Text,
-  useMantineTheme,
-} from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Avatar, Badge } from "@mantine/core";
 
 function RoleAvatar({ role }) {
-  const theme = useMantineTheme();
   let content;
 
   if (role?.employees?.length > 1) {
@@ -36,26 +27,7 @@ function RoleAvatar({ role }) {
   } else {
     content = <Badge color="yellow">Vacant Role</Badge>;
   }
-  return (
-    <Card
-      style={{
-        background:
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[5]
-            : theme.colors.gray[1],
-      }}
-      className="px-8"
-      radius="lg"
-      display="inline-block"
-    >
-      <Link to={`/roleDescendants/${role?.id}`}>
-        <Center className="grid place-items-center">
-          {content}
-          <Text fw={500}>{role?.name}</Text>
-        </Center>
-      </Link>
-    </Card>
-  );
+  return <div>{content}</div>;
 }
 
 export default RoleAvatar;

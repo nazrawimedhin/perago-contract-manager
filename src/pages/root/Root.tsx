@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   AppShell,
   Navbar,
@@ -6,13 +6,13 @@ import {
   MediaQuery,
   Burger,
   useMantineTheme,
-} from '@mantine/core';
-import { Outlet } from 'react-router-dom';
-import SideBar from '../../components/SideBar';
-import Head from '../../components/Head';
-import Notify from '../../components/Notify';
+} from "@mantine/core";
+import { Outlet } from "react-router-dom";
+import SideBar from "../../components/SideBar";
+import Head from "../../components/Head";
+import Notify from "../../components/Notify";
 
-export default function AppShellDemo() {
+export default function AppRoot() {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
 
@@ -20,15 +20,21 @@ export default function AppShellDemo() {
     <AppShell
       navbarOffsetBreakpoint="sm"
       navbar={
-        <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200 }}>
-          <SideBar/>
+        <Navbar
+          p="md"
+          hiddenBreakpoint="sm"
+          hidden={!opened}
+          width={{ sm: 200 }}
+        >
+          <SideBar />
         </Navbar>
       }
-
       header={
         <Header height={{ base: 50, md: 70 }} p="md">
-          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+          <div
+            style={{ display: "flex", alignItems: "center", height: "100%" }}
+          >
+            <MediaQuery largerThan="sm" styles={{ display: "none" }}>
               <Burger
                 opened={opened}
                 onClick={() => setOpened((o) => !o)}
@@ -37,13 +43,13 @@ export default function AppShellDemo() {
                 mr="xl"
               />
             </MediaQuery>
-            <Head/>
+            <Head />
           </div>
         </Header>
       }
     >
-      <Outlet/>
-      <Notify/>
+      <Outlet />
+      <Notify />
     </AppShell>
   );
 }

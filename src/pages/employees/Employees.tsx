@@ -20,7 +20,7 @@ function Employees() {
 
   return (
     <Container pos="relative">
-      <Text className="my-3" c="green" fw={500} fz={24}>
+      <Text className="my-2" c="green" fw={500} fz={24}>
         All Employees
       </Text>
       <Loading loading={loading} />

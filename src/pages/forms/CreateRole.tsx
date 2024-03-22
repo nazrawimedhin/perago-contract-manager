@@ -17,6 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { setStatus } from "../../features/Status";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../utils/config";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -77,8 +78,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function CreateRole() {
-
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const status = useSelector((state) => state.status);
   const dispatch = useDispatch();
   const { classes } = useStyles();
@@ -109,30 +109,66 @@ export default function CreateRole() {
         type: "load",
       })
     );
+
     await axios
-      .post("http://localhost:3000/roles/", data)
+      .post(`${API_URL}/roles/`, data)
       .then((response) => {
+        if (response.status === 201) {
+          dispatch(
+            setStatus({
+              title: "Success",
+              message: "Role Created successfully",
+              type: "success",
+            })
+          );
+          navigate("/roles");
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "success",
+            })
+          );
+        }
+      })
+      .catch(() => {
         dispatch(
           setStatus({
-            title: "Success",
-            message: "Role Created successfully",
-            type: "success",
+            title: "Network Error",
+            message: "Check you internet connection and try again.",
+            type: "error",
           })
-        );
-        Navigate("/roles");
-      })
-      .catch((error) => {
-        dispatch(
-          setStatus({ title: "Error", message: error.message, type: "error" })
         );
       });
   };
 
   useEffect(() => {
-    axios.get("http://localhost:3000/roles?flat=true").then((response) => {
-      setRolesFlat(response.data);
-    });
-  }, []);
+    axios
+      .get(`${API_URL}/roles?flat=true`)
+      .then((response) => {
+        if (response.status === 200) {
+          setRolesFlat(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Network Error",
+            message: "Check you internet connection and try again.",
+            type: "error",
+          })
+        );
+      });
+  });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

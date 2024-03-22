@@ -23,6 +23,7 @@ import { FaUpload } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { setStatus } from "../../features/Status";
 import { uploadFile } from "@uploadcare/upload-client";
+import { API_URL, UCARE_PUB_KEY } from "../../utils/config";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -78,20 +79,17 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function EditEmployee() {
-
-  const Navigate = useNavigate()
+  const navigate = useNavigate();
   const status = useSelector((state) => state.status);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { classes } = useStyles();
   const { id } = useParams();
   const [employee, setEmployee] = useState<Employee>();
   const [file, setFile] = useState<File | null>(null);
-
+  const [rolesFlat, setRolesFlat] = useState<Role[]>();
   const handleFile = async (file: File) => {
     setFile(file);
   };
-
-  const [rolesFlat, setRolesFlat] = useState<Role[]>();
 
   const EmployeeSchema = yup
     .object({
@@ -119,15 +117,18 @@ export default function EditEmployee() {
   type FormData = yup.InferType<typeof EmployeeSchema>;
 
   const onSubmit = async (data: FormData) => {
-
     dispatch(
-      setStatus({ title: "Loading", message: 'Uploading data to the server', type: "load" })
+      setStatus({
+        title: "Loading",
+        message: "Uploading data to the server",
+        type: "load",
+      })
     );
 
     let photo;
     if (file) {
       photo = await uploadFile(file, {
-        publicKey: "9a12ffff4c40ae9f57ef",
+        publicKey: UCARE_PUB_KEY,
         store: "auto",
         metadata: {
           subsystem: "uploader",
@@ -139,34 +140,94 @@ export default function EditEmployee() {
     const photoUrl = photo?.cdnUrl;
 
     await axios
-      .patch("http://localhost:3000/employees", {
+      .patch(`${API_URL}/employees`, {
         ...data,
         photo: photoUrl,
       })
-      .then(() => {
-        dispatch(
-          setStatus({ title: "Success", message: 'New employee created successfully', type: "success" })
-        );
-        Navigate('/employees')
+      .then((response) => {
+        if (response.status === 200) {
+          dispatch(
+            setStatus({
+              title: "Success",
+              message: "Employee updated successfully",
+              type: "success",
+            })
+          );
+          navigate("/employees");
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.error}`,
+              type: "error",
+            })
+          );
+        }
       })
-      .catch((error) => {
+      .catch(() => {
         dispatch(
-          setStatus({ title: "Error", message: error.message, type: "error" })
+          setStatus({
+            title: "Error",
+            message: "Check your network and try again.",
+            type: "error",
+          })
         );
       });
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/employees/${id}`).then((response) => {
-      setEmployee(response.data);
-    });
-  }, [id]);
+    axios
+      .get(`${API_URL}/employees/${id}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setEmployee(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.error}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Error",
+            message: "Check your network and try again.",
+            type: "error",
+          })
+        );
+      });
+  });
 
   useEffect(() => {
-    axios.get("http://localhost:3000/roles?flat=true").then((response) => {
-      setRolesFlat(response.data);
-    });
-  }, []);
+    axios
+      .get(`${API_URL}/roles?flat=true`)
+      .then((response) => {
+        if (response.status === 200) {
+          setRolesFlat(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.error}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Error",
+            message: "Check your network and try again.",
+            type: "error",
+          })
+        );
+      });
+  });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -262,9 +323,9 @@ export default function EditEmployee() {
                 control={control}
                 render={({ field }) => (
                   <DatePickerInput
-                    icon={<TbCalendar size="1.1rem" stroke={1.5} />}
+                    icon={<TbCalendar size="1.1rem" />}
                     label="Hire Date"
-                    placeholder={employee?.hireDate}
+                    // value={employee?.hireDate}
                     error={errors.hireDate?.message}
                     onChange={(value) => value && field.onChange(value)}
                     mx="auto"
@@ -300,9 +361,9 @@ export default function EditEmployee() {
                 control={control}
                 render={({ field }) => (
                   <DatePickerInput
-                    icon={<TbCalendar size="1.1rem" stroke={1.5} />}
+                    icon={<TbCalendar size="1.1rem" />}
                     label="Birth Date"
-                    placeholder={employee?.hireDate}
+                    // value={employee?.birthDate}
                     error={errors.birthDate?.message}
                     onChange={(value) => value && field.onChange(value)}
                     mx="auto"

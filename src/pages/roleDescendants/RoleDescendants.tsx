@@ -21,12 +21,12 @@ import { CreateRole, EmployeeResults, Role } from "../../utils/types";
 import Loading from "../../components/Loading";
 import { setStatus } from "../../features/Status";
 import { useDispatch, useSelector } from "react-redux";
+import { API_URL } from "../../utils/config";
 
 function RoleEmployees() {
-
   const dispatch = useDispatch();
   const status = useSelector((state) => state.status);
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const { id } = useParams();
   const [descendants, setDescendants] = useState<EmployeeResults>();
   const [role, setRole] = useState<Role>();
@@ -35,7 +35,6 @@ function RoleEmployees() {
   const [newParent, setNewParent] = useState<string>();
 
   const handleDelete = async () => {
-
     dispatch(
       setStatus({
         title: "Loading",
@@ -49,46 +48,118 @@ function RoleEmployees() {
     };
 
     await axios
-      .delete(`http://localhost:3000/roles/${id}`, data)
-      .then(() => {
+      .delete(`${API_URL}/roles/${id}`, data)
+      .then((response) => {
+        if (response.status === 204) {
+          dispatch(
+            setStatus({
+              title: "Success",
+              message: "New employee created successfully",
+              type: "success",
+            })
+          );
+          navigate("/roles");
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
         dispatch(
           setStatus({
-            title: "Success",
-            message: "New employee created successfully",
-            type: "success",
+            title: "Error",
+            message: "Check your internet connection and try again.",
+            type: "error",
           })
-        );
-        Navigate("/roles");
-      })
-      .catch((error) => {
-        console.log(error);
-        dispatch(
-          setStatus({ title: "Error", message: error.message, type: "error" })
         );
       });
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/roles/${id}`).then((response) => {
-      setRole(response.data);
-    });
-  }, [id]);
+    axios
+      .get(`${API_URL}/roles/${id}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setRole(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Error",
+            message: "Check your internet connection and try again.",
+            type: "error",
+          })
+        );
+      });
+  }, [id, dispatch]);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/roles/${id}/employees`)
+      .get(`${API_URL}/roles/${id}/employees`)
       .then((response) => {
-        setDescendants(response.data);
+        if (response.status === 200) {
+          setDescendants(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Error",
+            message: "Check your internet connection and try again.",
+            type: "error",
+          })
+        );
       });
-  }, [id]);
+  }, [id, dispatch]);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/roles/${id}/except_descendants`)
+      .get(`${API_URL}/roles/${id}/except_descendants`)
       .then((response) => {
-        setRolesExceptDescendants(response.data);
+        if (response.status === 200) {
+          setRolesExceptDescendants(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Error",
+            message: "Check your internet connection and try again.",
+            type: "error",
+          })
+        );
       });
-  }, [id]);
+  }, [id, dispatch]);
 
   return (
     <Container pos="relative">

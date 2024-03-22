@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { CreateRole, Role } from "../../utils/types";
 import { setStatus } from "../../features/Status";
 import { useDispatch, useSelector } from "react-redux";
+import { API_URL } from "../../utils/config";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -78,13 +79,13 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function EditRole() {
-
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const status = useSelector((state) => state.status);
   const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
   const { classes } = useStyles();
-  const [rolesExceptDescendants, setRolesExceptDescendants] = useState<Role[]>();
+  const [rolesExceptDescendants, setRolesExceptDescendants] =
+    useState<Role[]>();
   const [role, setRole] = useState<Role>();
 
   const RoleSchema = yup
@@ -118,37 +119,91 @@ export default function EditRole() {
     );
 
     await axios
-      .patch(`http://localhost/:3000/${id}`, data)
+      .patch(`${API_URL}/${id}`, data)
       .then((response) => {
+        if (response.status === 200) {
+          dispatch(
+            setStatus({
+              title: "Success",
+              message: "Role Created successfully",
+              type: "success",
+            })
+          );
+          navigate("/roles");
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "success",
+            })
+          );
+        }
+      })
+      .catch(() => {
         dispatch(
           setStatus({
-            title: "Success",
-            message: "Role Created successfully",
-            type: "success",
+            title: "Error",
+            message: "Check your internet connection and try again.",
+            type: "error",
           })
-        );
-        Navigate('/roles')
-      })
-      .catch((error) => {
-        dispatch(
-          setStatus({ title: "Error", message: error.message, type: "error" })
         );
       });
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/roles/${id}`).then((response) => {
-      setRole(response.data);
-    });
-  }, [id]);
+    axios
+      .get(`${API_URL}/roles/${id}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setRole(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Error",
+            message: "Check your internet connection and try again.",
+            type: "error",
+          })
+        );
+      });
+  }, [id, dispatch]);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/roles/${id}/except_descendants`)
+      .get(`${API_URL}/roles/${id}/except_descendants`)
       .then((response) => {
-        setRolesExceptDescendants(response.data);
+        if (response.status === 200) {
+          setRolesExceptDescendants(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Network Error",
+            message: "Check you internet connection and try again.",
+            type: "error",
+          })
+        );
       });
-  }, [id]);
+  }, [id, dispatch]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -212,9 +267,11 @@ export default function EditRole() {
             )}
           />
           <Group position="right" mt="md">
-            <Button 
+            <Button
               disabled={status?.type === "load"}
-              type="submit" className={`${classes.button} bg-green-600`}>
+              type="submit"
+              className={`${classes.button} bg-green-600`}
+            >
               Update Role
             </Button>
           </Group>

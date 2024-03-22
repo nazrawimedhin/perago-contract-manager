@@ -6,13 +6,16 @@ import {
   Text,
   createStyles,
 } from "@mantine/core";
-import SubRole from "../../components/SubRole";
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import RoleAvatar from "../../components/RoleAvatar";
+import SubRole from "../../components/SubRole";
+import RoleCard from "../../components/RoleCard";
 import { EmployeeResults, Role } from "../../utils/types";
 import Loading from "../../components/Loading";
+import { API_URL } from "../../utils/config";
+import { setStatus } from "../../features/Status";
+import { useDispatch } from "react-redux";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -25,35 +28,75 @@ const useStyles = createStyles((theme) => ({
 
 function RoleGroup() {
   const { classes } = useStyles();
-
   const { id } = useParams();
   const [role, setRole] = useState<Role>();
   const [loading, setLoading] = useState(false);
   const [descendants, setDescendants] = useState<EmployeeResults>();
-
-  useEffect(() => {
-    setLoading(true);
-    axios.get(`http://localhost:3000/roles/${id}`).then((response) => {
-      setRole(response.data);
-      setLoading(false);
-    });
-  }, [id]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`http://localhost:3000/roles/${id}/employees`)
+      .get(`${API_URL}/roles/${id}`)
       .then((response) => {
-        setDescendants(response.data);
-        setLoading(false);
+        if (response.status === 200) {
+          setRole(response.data);
+          setLoading(false);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Success",
+              message: `${response.data.message}`,
+              type: "success",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Error",
+            message: "Check your internet connection and try again",
+            type: "error",
+          })
+        );
       });
-  }, [id]);
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(`${API_URL}/roles/${id}/employees`)
+      .then((response) => {
+        if (response.status === 200) {
+          setDescendants(response.data);
+          setLoading(false);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Success",
+              message: `${response.data.message}`,
+              type: "success",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Error",
+            message: "Check your internet connection and try again",
+            type: "error",
+          })
+        );
+      });
+  }, [id, dispatch]);
 
   return (
     <Container pos={"relative"}>
       <Loading loading={loading} />
       <Group className="flex justify-between mt-7 mb-10">
-        <RoleAvatar role={role} />
+        <RoleCard role={role} />
         <Card className={`${classes.card}  p-5`} radius="lg">
           <Text fw={700} fz="lg">
             {role?.children.length} Sub Roles

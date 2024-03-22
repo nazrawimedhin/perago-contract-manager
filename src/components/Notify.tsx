@@ -5,9 +5,8 @@ import { BiSolidErrorCircle } from "react-icons/bi";
 import { useSelector } from "react-redux";
 
 function Notify() {
-
   const status = useSelector((state) => state.status);
-  const [opened, { toggle, close }] = useDisclosure(!status);
+  const [opened, { close }] = useDisclosure(!status);
 
   if (!status) {
     return null;
@@ -22,15 +21,10 @@ function Notify() {
   const { title, message, type } = status;
 
   return (
-    <Dialog
-      opened={opened}
-      onClose={close}
-      size="lg"
-      radius="lg"
-    >
+    <Dialog opened={opened} onClose={close} size="lg" radius="lg">
       <Notification
         my={15}
-        radius='lg'
+        radius="lg"
         onClose={close}
         title={title}
         loading={type === "load"}

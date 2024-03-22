@@ -9,45 +9,70 @@ import {
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaUserEdit } from "react-icons/fa";
 import { MdPersonRemove } from "react-icons/md";
 import Loading from "../../components/Loading";
 import { useDispatch } from "react-redux";
 import { setStatus } from "../../features/Status";
+import { API_URL } from "../../utils/config";
+import { Employee } from "../../utils/types";
 
-function Employee() {
-
-  const dispatch = useDispatch()
+function EachEmployee() {
+  const dispatch = useDispatch();
   const { id } = useParams();
-  const [employee, setEmployee] = useState();
+  const [employee, setEmployee] = useState<Employee>();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     dispatch(
-      setStatus({ title: "Loading", message: 'Uploading data to the server', type: "load" })
+      setStatus({
+        title: "Loading",
+        message: "Requesting the server",
+        type: "load",
+      })
     );
 
     await axios
-      .delete(`http://localhost:3000/employees/${id}`)
+      .delete(`${API_URL}/employees/${id}`)
       .then((response) => {
+        if (response.status === 204) {
+          dispatch(
+            setStatus({
+              title: "Success",
+              message: "Employee deleted successfully",
+              type: "success",
+            })
+          );
+          navigate("/");
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.message}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
         dispatch(
-          setStatus({ title: "Success", message: 'Employee deleted successfully', type: "success" })
+          setStatus({
+            title: "Network Error",
+            message: "Check your internet connection, and try again.",
+            type: "error",
+          })
         );
-      }).catch( (error) => {
-        dispatch(
-          setStatus({ title: "Success", message: error.error.message, type: "success" })
-        );
-      }
-      );
+      });
   };
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`http://localhost:3000/employees/${id}`).then((response) => {
+    axios.get(`${API_URL}/employees/${id}`).then((response) => {
       setEmployee(response.data);
+      setLoading(false);
     });
-    setLoading(false);
   }, [id]);
 
   return (
@@ -63,12 +88,16 @@ function Employee() {
               </Text>
               <Text>{employee.email}</Text>
               <Text>{employee.phone}</Text>
-              <Text>{employee.hireDate}</Text>
-              <Text>{employee.birthDate}</Text>
+              <Text>{String(employee.hireDate)}</Text>
+              <Text>{String(employee.birthDate)}</Text>
               <Text>{employee.gender}</Text>
               <Group className="flex">
-                <Link to={{ pathname: `/editEmployee/${employee.id}`}}>
-                  <Button variant="subtle" color='green' rightIcon={<FaUserEdit />}>
+                <Link to={{ pathname: `/editEmployee/${employee.id}` }}>
+                  <Button
+                    variant="subtle"
+                    color="green"
+                    rightIcon={<FaUserEdit />}
+                  >
                     Edit
                   </Button>
                 </Link>
@@ -80,9 +109,13 @@ function Employee() {
                   radius="xl"
                 >
                   <Popover.Target>
-                      <Button variant="subtle" color="red" rightIcon={<MdPersonRemove />}>
-                        Delete
-                      </Button>
+                    <Button
+                      variant="subtle"
+                      color="red"
+                      rightIcon={<MdPersonRemove />}
+                    >
+                      Delete
+                    </Button>
                   </Popover.Target>
                   <Popover.Dropdown className="grid place-items-center">
                     <Button
@@ -124,4 +157,4 @@ function Employee() {
   );
 }
 
-export default Employee;
+export default EachEmployee;

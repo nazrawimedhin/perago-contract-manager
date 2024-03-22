@@ -22,6 +22,8 @@ import { uploadFile } from "@uploadcare/upload-client";
 import { setStatus } from "../../features/Status";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../utils/config";
+import { UCARE_PUB_KEY } from "../../utils/config";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -78,8 +80,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function CreateEmployee() {
-
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const [rolesFlat, setRolesFlat] = useState();
   const { classes } = useStyles();
   const [file, setFile] = useState<File | null>(null);
@@ -112,15 +113,18 @@ export default function CreateEmployee() {
   type FormData = yup.InferType<typeof EmployeeSchema>;
 
   const onSubmit = async (data: FormData) => {
-
     dispatch(
-      setStatus({ title: "Loading", message: 'Uploading data to the server', type: "load" })
+      setStatus({
+        title: "Loading",
+        message: "Uploading data to the server",
+        type: "load",
+      })
     );
 
     let photo;
     if (file) {
       photo = await uploadFile(file, {
-        publicKey: "9a12ffff4c40ae9f57ef",
+        publicKey: UCARE_PUB_KEY,
         store: "auto",
         metadata: {
           subsystem: "uploader",
@@ -132,28 +136,67 @@ export default function CreateEmployee() {
     const photoUrl = photo?.cdnUrl;
 
     await axios
-      .post("http://localhost:3000/employees", {
+      .post(`${API_URL}/employees`, {
         ...data,
         photo: photoUrl,
       })
-      .then(() => {
-        dispatch(
-          setStatus({ title: "Success", message: 'New employee created successfully', type: "success" })
-        );
-        Navigate('/employees')
+      .then((response) => {
+        if (response.status === 201) {
+          dispatch(
+            setStatus({
+              title: "Success",
+              message: "New employee created successfully",
+              type: "success",
+            })
+          );
+          navigate("/employees");
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.error}`,
+              type: "error",
+            })
+          );
+        }
       })
-      .catch((error) => {
+      .catch(() => {
         dispatch(
-          setStatus({ title: "Error", message: error.message, type: "error" })
+          setStatus({
+            title: "Network Error",
+            message: "Check your internet and try again.",
+            type: "error",
+          })
         );
       });
   };
 
   useEffect(() => {
-    axios.get("http://localhost:3000/roles?flat=true").then((response) => {
-      setRolesFlat(response.data);
-    });
-  }, []);
+    axios
+      .get(`${API_URL}/roles?flat=true`)
+      .then((response) => {
+        if (response.status === 200) {
+          setRolesFlat(response.data);
+        } else {
+          dispatch(
+            setStatus({
+              title: "Error",
+              message: `${response.data.error}`,
+              type: "error",
+            })
+          );
+        }
+      })
+      .catch(() => {
+        dispatch(
+          setStatus({
+            title: "Network Error",
+            message: "Check your internet and try again.",
+            type: "error",
+          })
+        );
+      });
+  });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -255,7 +298,7 @@ export default function CreateEmployee() {
                 control={control}
                 render={({ field }) => (
                   <DatePickerInput
-                    icon={<TbCalendar size="1.1rem" stroke={1.5} />}
+                    icon={<TbCalendar size="1.1rem" />}
                     label="Hire Date"
                     placeholder="Hire Date"
                     error={errors.hireDate?.message}
@@ -294,7 +337,7 @@ export default function CreateEmployee() {
                 control={control}
                 render={({ field }) => (
                   <DatePickerInput
-                    icon={<TbCalendar size="1.1rem" stroke={1.5} />}
+                    icon={<TbCalendar size="1.1rem" />}
                     label="Birth Date"
                     placeholder="Pick Birth Date"
                     error={errors.birthDate?.message}

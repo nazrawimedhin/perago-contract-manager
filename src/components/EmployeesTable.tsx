@@ -33,7 +33,7 @@ function EmployeesTable({ employees }: Props) {
         <Text fz={16}>{employee?.role.name}</Text>
       </td>
       <td>
-        <Text fz={16}>{employee?.role.reportsTo?.name ||employee?.reportsTo?.name}</Text>
+        <Text fz={16}>{employee?.role.reportsTo?.name}</Text>
       </td>
     </tr>
   ));

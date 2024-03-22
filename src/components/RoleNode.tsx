@@ -1,9 +1,9 @@
 import { TreeNode } from "react-organizational-chart";
-import RoleAvatar from "./RoleAvatar";
+import RoleCard from "./RoleCard";
 
 export default function RoleNode({ role }) {
   return (
-    <TreeNode label={<RoleAvatar role={role} />}>
+    <TreeNode label={<RoleCard role={role} />}>
       {role.children?.map((role, index) => (
         <RoleNode role={role} key={index} />
       ))}

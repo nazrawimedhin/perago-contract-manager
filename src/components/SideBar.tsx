@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createStyles, Navbar, getStylesRef, rem, Button } from "@mantine/core";
-import { TbSettings, TbSwitchHorizontal } from "react-icons/tb";
 import { IoAdd } from "react-icons/io5";
 import { IoIosPeople } from "react-icons/io";
-import { SiCriticalrole } from "react-icons/si";
 import { TbBinaryTree } from "react-icons/tb";
+import { RiGroupFill } from "react-icons/ri";
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -54,6 +53,7 @@ const useStyles = createStyles((theme) => ({
   footer: {
     paddingTop: theme.spacing.md,
     marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.xl,
     marginLeft: theme.spacing.sm,
     borderTop: `${rem(1)} solid ${
       theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[2]
@@ -68,21 +68,18 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const data = [
-  { link: "/", label: "All Roles", icon: TbBinaryTree },
+  { link: "/", label: "Roles Tree", icon: TbBinaryTree },
   { link: "/employees", label: "All Employees", icon: IoIosPeople },
-  { link: "/roleGroup", label: "Role Group", icon: SiCriticalrole },
-  { link: "/", label: "Other Settings", icon: TbSettings },
+  { link: "/roleGroup", label: "Role Group", icon: RiGroupFill },
 ];
 
 export function SideBar() {
   const navigate = useNavigate();
-
+  const { classes, cx } = useStyles();
+  const [active, setActive] = useState("Role");
   const handleClick = (link: string) => {
     navigate(link);
   };
-
-  const { classes, cx } = useStyles();
-  const [active, setActive] = useState("Role");
 
   const links = data.map((item) => (
     <a
@@ -105,7 +102,6 @@ export function SideBar() {
   return (
     <Navbar height={680} width={{ sm: 200 }} p="lg">
       <Navbar.Section grow>{links}</Navbar.Section>
-      <TbSwitchHorizontal className={classes.linkIcon} />
       <Navbar.Section className={classes.footer}>
         <Link to="/createRole">
           <Button
