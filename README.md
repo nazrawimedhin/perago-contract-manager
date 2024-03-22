@@ -51,7 +51,7 @@ This will launch the app, and you can access it through your web browser at http
 
 - HTML5
 - CSS3
-- JavaScript / ES6
+- TypeScript
 
 ### Libraries / Frameworks
 
