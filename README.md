@@ -1,42 +1,73 @@
-# Perago - Contract Manager App
+# Perago Contract Manager
 
-Welcome to the Contract Manager App! This application serves as a comprehensive tool for managing contracts within an organization. Below, you'll find information on how to use the app to list all employees, their roles, and explore the organizational hierarchy.
+This web application serves as a comprehensive tool for managing contracts within an organization. Below, you'll find information on how to install and use it.
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
-- [Organizational Hierarchy](#organizational-hierarchy)
-- [Contributing](#contributing)
-- [License](#license)
+- [Technologies](#technologies)
 
 ## Installation
 
-To install the Contract Manager App, follow these steps:
+To install follow these steps:
+
+### Install Front-End
 
 1. Clone the repository: `git clone https://github.com/nazrawimedhin/perago-contract-manager.git`
 2. Navigate to the project directory: `cd perago-contract-manager`
 3. Install dependencies: `npm install` or `yarn install`
+
+### Install Back-End
+
+- Follow this [link](https://github.com/dere7/perago-test-project) to find the back-end
 
 ## Usage
 
 Once installed, you can run the app using the following command:
 
 ```bash
-npm run dev
-```bash
+npm run dev or yarn dev
+```
 
-This will launch the Contract Manager App, and you can access it through your web browser at http://localhost:3000.
+This will launch the app, and you can access it through your web browser at http://localhost:3000.
 
-Features
-Contract Management: Easily manage and track all contracts within the organization.
-Employee Listing: View a comprehensive list of all employees along with their roles.
-Role-Based Access: Ensure secure access to sensitive contract information based on employee roles.
-Search Functionality: Quickly locate employees and contracts using the search feature.
+## Features
 
-Organizational Hierarchy
-The Contract Manager App provides a clear view of the organizational hierarchy, allowing users to understand the reporting structure and relationships between different roles. To explore the organizational hierarchy:
+### Roles
 
-Navigate to the "Organizational Hierarchy" section in the app.
-Browse through the interactive hierarchy chart to see the relationships between employees and their respective roles.
+- List of all existing roles
+- create, update and delete roles
+
+### Employees
+
+- List of all employees under every role
+- create, update and delete employees
+
+## Technologies
+
+### Languages
+
+- HTML5
+- CSS3
+- JavaScript / ES6
+
+### Libraries / Frameworks
+
+- React.JS
+- Mantine UI - (A React component Library)
+- Tailwind CSS
+
+### External Libraries
+
+- [axios](https://axios-http.com/docs/intro)
+- [react-redux](https://react-redux.js.org)
+- [react-hook-form](https://react-hook-form.com)
+- [react-icons](https://react-icons.github.io/react-icons/)
+- [yup](https://www.npmjs.com/package/yup)
+- [react-organizational-chart](https://www.npmjs.com/package/react-organizational-chart)
+
+### Third party services
+
+- [uploadcare](uploadcare.com) - CDN server for images
