@@ -6,8 +6,8 @@ interface BaseRole {
 
 export interface Role extends BaseRole {
   children: Role[];
-  employees: Employee[]
-  reportsTo: Role
+  employees: Employee[];
+  reportsTo: Role;
 }
 
 export interface CreateRole extends BaseRole {
@@ -15,8 +15,8 @@ export interface CreateRole extends BaseRole {
 }
 
 export enum Gender {
-  Male = 'M',
-  Female = 'F',
+  Male = "M",
+  Female = "F",
 }
 
 export interface Employee {
@@ -37,4 +37,10 @@ export interface EmployeeResults {
   limit: number;
   total: number;
   results: Employee[];
+}
+
+export interface StatusState {
+  title: string;
+  message: string;
+  type: string;
 }

@@ -4,19 +4,18 @@ import {
   ColorSchemeProvider,
   MantineProvider,
 } from "@mantine/core";
+import { useHotkeys, useLocalStorage } from "@mantine/hooks";
 import Root from "./pages/root/Root";
 import Chiefs from "./pages/chiefs/Chiefs";
 import Employees from "./pages/employees/Employees";
 import CreateRole from "./pages/forms/CreateRole";
 import CreateEmployee from "./pages/forms/CreateEmployee";
-import Employee from "./pages/employee/Employee";
+import EachEmployee from "./pages/employee/Employee";
 import RolesTree from "./pages/rolesTree/RolesTree";
 import EditEmployee from "./pages/forms/EditEmployee";
 import RoleGroup from "./pages/roleGroup/RoleGroup";
 import EditRole from "./pages/forms/EditRole";
 import RoleDescendants from "./pages/roleDescendants/RoleDescendants";
-import { useHotkeys, useLocalStorage } from "@mantine/hooks";
-// import theme from './utils/theme'
 
 function App() {
   const router = createBrowserRouter([
@@ -42,7 +41,7 @@ function App() {
         },
         {
           path: "/employees/:id",
-          element: <Employee />,
+          element: <EachEmployee />,
         },
         {
           path: "/createRole",
