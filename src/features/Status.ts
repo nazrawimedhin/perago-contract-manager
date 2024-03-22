@@ -1,12 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { StatusState } from '../utils/types'
 
-export interface StatusState {
-  title: string;
-  message: string;
-  type: string;
-}
-
-const initialState: StatusState | null =null
+const initialState: StatusState | null = null
 
 export const statusSlice = createSlice({
   name: 'status',

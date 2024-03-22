@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { API_URL } from "../utils/config";
 
 const initialState = {
   loading: false,
@@ -8,10 +9,13 @@ const initialState = {
   error: "",
 };
 
-export const fetchEmployees = createAsyncThunk("fetchEmployees", async (page) => {
-  const response = await axios.get(`http://localhost:3000/employees?page=${page}`);
-  return response.data;
-});
+export const fetchEmployees = createAsyncThunk(
+  "fetchEmployees",
+  async (page) => {
+    const response = await axios.get(`${API_URL}/employees?page=${page}`);
+    return response.data;
+  }
+);
 
 export const employeesSlice = createSlice({
   name: "employees",
@@ -24,7 +28,7 @@ export const employeesSlice = createSlice({
       })
       .addCase(fetchEmployees.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload
+        state.data = action.payload;
       })
       .addCase(fetchEmployees.rejected, (state, action) => {
         state.loading = false;

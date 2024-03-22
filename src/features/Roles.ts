@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { API_URL } from "../utils/config";
 
 const initialState = {
   loading: false,
@@ -9,7 +10,7 @@ const initialState = {
 };
 
 export const fetchRoles = createAsyncThunk("fetchRoles", async () => {
-  const response = await axios.get("http://localhost:3000/roles");
+  const response = await axios.get(`${API_URL}/roles`);
   return response.data;
 });
 
